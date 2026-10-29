@@ -28,11 +28,11 @@
 
         header {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         h1 {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: #00f6ff;
             letter-spacing: 1px;
             text-shadow: 0 0 8px rgba(0, 246, 255, 0.4);
@@ -45,11 +45,11 @@
             max-width: 420px;
             font-size: 0.85rem;
             color: #a0a0c0;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             padding: 0 4px;
         }
 
-        /* Sudoku Grid */
+        /* Sudoku Grid Layout with Bold 3x3 Borders */
         #sudoku-grid {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
@@ -70,17 +70,29 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #ffffff;
             cursor: pointer;
         }
 
-        /* 3x3 Box Borders */
-        .cell:nth-child(3n) { border-right: 2px solid #00f6ff; }
-        .cell:nth-child(9n) { border-right: none; }
+        /* Thick 3x3 Internal Section Borders */
+        .cell:nth-child(3), .cell:nth-child(6),
+        .cell:nth-child(12), .cell:nth-child(15),
+        .cell:nth-child(21), .cell:nth-child(24),
+        .cell:nth-child(30), .cell:nth-child(33),
+        .cell:nth-child(39), .cell:nth-child(42),
+        .cell:nth-child(48), .cell:nth-child(51),
+        .cell:nth-child(57), .cell:nth-child(60),
+        .cell:nth-child(66), .cell:nth-child(69),
+        .cell:nth-child(75), .cell:nth-child(78) {
+            border-right: 2px solid #00f6ff;
+        }
+
         .cell:nth-n(n+19):nth-n(-27), 
-        .cell:nth-n(n+46):nth-n(-54) { border-bottom: 2px solid #00f6ff; }
+        .cell:nth-n(n+46):nth-n(-54) {
+            border-bottom: 2px solid #00f6ff;
+        }
 
         .cell.given {
             color: #00f6ff;
@@ -88,16 +100,16 @@
         }
 
         .cell.selected {
-            background-color: #2e2e48 !important;
+            background-color: #32324e !important;
             box-shadow: inset 0 0 0 2px #ff007f;
         }
 
-        .cell.highlighted {
-            background-color: #222238;
+        .cell.highlight-match {
+            background-color: #3a3822 !important; /* Soft gold highlight for matching numbers */
         }
 
-        .cell.error {
-            color: #ff3366 !important;
+        .cell.highlight-match-val {
+            color: #ffd700 !important;
         }
 
         /* Pencil Marks (Notes) Subgrid */
@@ -110,7 +122,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            font-size: 0.45rem;
+            font-size: 0.48rem;
             color: #8888aa;
             padding: 1px;
         }
@@ -119,6 +131,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        .note-item.highlight-note {
+            color: #ffd700 !important;
+            font-weight: bold;
         }
 
         /* Controls Layout */
@@ -130,7 +147,6 @@
             gap: 8px;
         }
 
-        /* Tool Modes (Pencil vs Number vs Color) */
         .toolbar {
             display: flex;
             justify-content: space-between;
@@ -157,7 +173,6 @@
             font-weight: bold;
         }
 
-        /* Color Palette for Candidate Highlighting */
         .color-palette {
             display: flex;
             justify-content: center;
@@ -166,8 +181,8 @@
         }
 
         .color-swatch {
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             border: 2px solid #444;
             cursor: pointer;
@@ -179,7 +194,6 @@
         .swatch-yellow { background: #ffd700; }
         .swatch-green { background: #00ff66; }
 
-        /* Number Keypad */
         .keypad {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -193,7 +207,7 @@
             font-size: 1.2rem;
             font-family: inherit;
             font-weight: bold;
-            padding: 12px 0;
+            padding: 11px 0;
             border-radius: 6px;
             text-align: center;
             cursor: pointer;
@@ -214,7 +228,7 @@
             background: #2a1b3d;
             border: 1px solid #ff007f;
             color: #ff007f;
-            padding: 10px;
+            padding: 9px;
             font-family: inherit;
             font-size: 0.8rem;
             font-weight: bold;
@@ -242,14 +256,12 @@
     <div id="sudoku-grid"></div>
 
     <div class="controls-container">
-        <!-- Toolbars -->
         <div class="toolbar">
             <button class="tool-btn active" id="mode-num" onclick="setMode('num')">Number</button>
             <button class="tool-btn" id="mode-note" onclick="setMode('note')">Pencil Marks</button>
             <button class="tool-btn" id="btn-auto-notes" onclick="autoFillNotes()">Auto-Notes</button>
         </div>
 
-        <!-- Color Swatches for Candidate/Cell Highlighting -->
         <div class="color-palette">
             <span style="font-size:0.75rem; align-self:center; color:#888;">Color:</span>
             <div class="color-swatch swatch-none active" onclick="selectColor('')" title="No Color"></div>
@@ -259,7 +271,6 @@
             <div class="color-swatch swatch-green" onclick="selectColor('#00ff66')" title="Green Chain"></div>
         </div>
 
-        <!-- 1-9 Keypad + Erase -->
         <div class="keypad">
             <button class="key-btn" onclick="inputNumber(1)">1</button>
             <button class="key-btn" onclick="inputNumber(2)">2</button>
@@ -280,7 +291,6 @@
     </div>
 
     <script>
-        // Pre-packaged Ultra Extreme / Hard Puzzle Bank (81 chars, 0 = empty)
         const PUZZLE_BANK = [
             "000700000100000000000430200000000006000509000000000418000081000002000050040000300",
             "020000000000600003074080000000003010080004000006000750500000100010900000000200008",
@@ -289,10 +299,10 @@
 
         let board = [];
         let initialBoard = [];
-        let notes = Array(81).fill().map(() => Set ? new Set() : []);
-        let cellColors = Array(81).fill(""); // Stores candidate/cell custom highlighting colors
+        let notes = Array(81).fill().map(() => new Set());
+        let cellColors = Array(81).fill("");
         let selectedCell = null;
-        let inputMode = 'num'; // 'num' or 'note'
+        let inputMode = 'num';
         let activeColor = '';
         let timerInterval = null;
         let secondsElapsed = 0;
@@ -325,12 +335,11 @@
                     cell.classList.add('given');
                     cell.innerText = initialBoard[i];
                 } else {
-                    // Create 3x3 notes container
                     const notesContainer = document.createElement('div');
                     notesContainer.className = 'notes-grid';
                     for (let n = 1; n <= 9; n++) {
                         const noteCell = document.createElement('div');
-                        noteCell.className = `note-${n}`;
+                        noteCell.className = `note-item note-${n}`;
                         notesContainer.appendChild(noteCell);
                     }
                     cell.appendChild(notesContainer);
@@ -344,15 +353,7 @@
 
         function selectCellIndex(index) {
             selectedCell = index;
-            document.querySelectorAll('.cell').forEach((c, idx) => {
-                c.classList.remove('selected', 'highlighted');
-                if (idx === index) c.classList.add('selected');
-                
-                // Highlight matching numbers or row/col/box if desired
-                if (board[index] !== 0 && board[idx] === board[index]) {
-                    c.classList.add('highlighted');
-                }
-            });
+            updateGridDisplay();
         }
 
         function setMode(mode) {
@@ -366,7 +367,6 @@
             document.querySelectorAll('.color-swatch').forEach(sw => sw.classList.remove('active'));
             event.target.classList.add('active');
 
-            // If a cell is selected and a color is chosen, paint the cell background or apply tag
             if (selectedCell !== null && initialBoard[selectedCell] === 0) {
                 cellColors[selectedCell] = color;
                 updateGridDisplay();
@@ -376,13 +376,9 @@
         function inputNumber(num) {
             if (selectedCell === null || initialBoard[selectedCell] !== 0) return;
 
-            if (activeColor !== '' && num !== 0) {
-                // If color mode is active, you could map candidate marking colors here if needed
-            }
-
             if (inputMode === 'num') {
                 board[selectedCell] = num;
-                notes[selectedCell].clear(); // clear pencil marks if value entered
+                notes[selectedCell].clear();
             } else if (inputMode === 'note' && num !== 0) {
                 if (board[selectedCell] === 0) {
                     if (notes[selectedCell].has(num)) {
@@ -401,30 +397,61 @@
         }
 
         function updateGridDisplay() {
+            // Determine active target number to highlight based on selected cell
+            let activeVal = null;
+            if (selectedCell !== null) {
+                if (board[selectedCell] !== 0) {
+                    activeVal = board[selectedCell];
+                }
+            }
+
             const cells = document.querySelectorAll('.cell');
             cells.forEach((cell, i) => {
                 const val = board[i];
                 const notesContainer = cell.querySelector('.notes-grid');
                 
-                // Apply Custom Color Highlighting
+                cell.classList.remove('selected', 'highlight-match', 'highlight-match-val');
+
+                if (i === selectedCell) {
+                    cell.classList.add('selected');
+                }
+
+                // Custom Color Highlighting
                 if (cellColors[i]) {
-                    cell.style.backgroundColor = cellColors[i] + '33'; // transparent tint
+                    cell.style.backgroundColor = cellColors[i] + '33';
                     cell.style.borderColor = cellColors[i];
                 } else {
                     cell.style.backgroundColor = initialBoard[i] !== 0 ? '#161622' : '#1a1a24';
                 }
 
+                // Matching Number Highlighting across board & candidate notes
+                let isMatch = activeVal !== null && val === activeVal;
+                if (isMatch && i !== selectedCell) {
+                    cell.classList.add('highlight-match');
+                }
+
                 if (val !== 0) {
                     cell.innerText = val;
-                    cell.style.color = initialBoard[i] !== 0 ? '#00f6ff' : '#ffffff';
+                    if (isMatch) {
+                        cell.classList.add('highlight-match-val');
+                    } else {
+                        cell.style.color = initialBoard[i] !== 0 ? '#00f6ff' : '#ffffff';
+                    }
                 } else {
                     cell.innerText = '';
                     if (notesContainer) {
                         cell.appendChild(notesContainer);
                         for (let n = 1; n <= 9; n++) {
                             const noteEl = notesContainer.children[n-1];
-                            noteEl.innerText = notes[i].has(n) ? n : '';
-                            // Color specific pencil notes if wanted
+                            const hasNote = notes[i].has(n);
+                            noteEl.innerText = hasNote ? n : '';
+                            
+                            // Highlight matching candidate notes if activeVal matches note number
+                            if (activeVal !== null && n === activeVal && hasNote) {
+                                noteEl.classList.add('highlight-note');
+                            } else {
+                                noteEl.classList.remove('highlight-note');
+                            }
                         }
                     }
                 }
@@ -486,7 +513,6 @@
             }, 1000);
         }
 
-        // Initialize on load
         initGame();
     </script>
 </body>
