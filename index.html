@@ -49,7 +49,7 @@
             padding: 0 4px;
         }
 
-        /* Sudoku Grid Layout with Bold 3x3 Borders */
+        /* Sudoku Grid Layout */
         #sudoku-grid {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
@@ -76,21 +76,11 @@
             cursor: pointer;
         }
 
-        /* Thick 3x3 Internal Section Borders */
-        .cell:nth-child(3), .cell:nth-child(6),
-        .cell:nth-child(12), .cell:nth-child(15),
-        .cell:nth-child(21), .cell:nth-child(24),
-        .cell:nth-child(30), .cell:nth-child(33),
-        .cell:nth-child(39), .cell:nth-child(42),
-        .cell:nth-child(48), .cell:nth-child(51),
-        .cell:nth-child(57), .cell:nth-child(60),
-        .cell:nth-child(66), .cell:nth-child(69),
-        .cell:nth-child(75), .cell:nth-child(78) {
+        /* Bold 3x3 Section Dividers */
+        .cell.thick-right {
             border-right: 2px solid #00f6ff;
         }
-
-        .cell:nth-n(n+19):nth-n(-27), 
-        .cell:nth-n(n+46):nth-n(-54) {
+        .cell.thick-bottom {
             border-bottom: 2px solid #00f6ff;
         }
 
@@ -105,7 +95,7 @@
         }
 
         .cell.highlight-match {
-            background-color: #3a3822 !important; /* Soft gold highlight for matching numbers */
+            background-color: #3a3822 !important;
         }
 
         .cell.highlight-match-val {
@@ -331,6 +321,13 @@
                 cell.className = 'cell';
                 cell.dataset.index = i;
 
+                let col = i % 9;
+                let row = Math.floor(i / 9);
+
+                // Explicitly add thick borders for 3x3 box grid divisions
+                if (col === 2 || col === 5) cell.classList.add('thick-right');
+                if (row === 2 || row === 5) cell.classList.add('thick-bottom');
+
                 if (initialBoard[i] !== 0) {
                     cell.classList.add('given');
                     cell.innerText = initialBoard[i];
@@ -397,7 +394,6 @@
         }
 
         function updateGridDisplay() {
-            // Determine active target number to highlight based on selected cell
             let activeVal = null;
             if (selectedCell !== null) {
                 if (board[selectedCell] !== 0) {
@@ -416,15 +412,12 @@
                     cell.classList.add('selected');
                 }
 
-                // Custom Color Highlighting
                 if (cellColors[i]) {
                     cell.style.backgroundColor = cellColors[i] + '33';
-                    cell.style.borderColor = cellColors[i];
                 } else {
                     cell.style.backgroundColor = initialBoard[i] !== 0 ? '#161622' : '#1a1a24';
                 }
 
-                // Matching Number Highlighting across board & candidate notes
                 let isMatch = activeVal !== null && val === activeVal;
                 if (isMatch && i !== selectedCell) {
                     cell.classList.add('highlight-match');
@@ -446,7 +439,6 @@
                             const hasNote = notes[i].has(n);
                             noteEl.innerText = hasNote ? n : '';
                             
-                            // Highlight matching candidate notes if activeVal matches note number
                             if (activeVal !== null && n === activeVal && hasNote) {
                                 noteEl.classList.add('highlight-note');
                             } else {
